@@ -54,6 +54,14 @@ pub fn create_session_link() -> String {
     )
 }
 
+/// Create the session and return the session id.
+pub fn make_session() -> Result<String, reqwest::Error> {
+    let link = create_session_link();
+    let response = fetch_json(&link)?;
+    let session: Session = serde_json::from_str(&response).unwrap();
+    Ok(session.get_session_id().to_string())
+}
+
 /// Use session id to create links to any method call.
 pub fn create_link(method: &str, session_id: &str, timestamp: &str) -> String {
     let devid = read_secret("devid");
@@ -70,12 +78,4 @@ pub fn create_link(method: &str, session_id: &str, timestamp: &str) -> String {
 pub fn fetch_json(link: &str) -> Result<String, reqwest::Error> {
     let response = reqwest::blocking::get(link)?.text()?;
     Ok(response)
-}
-
-/// Create the session and return the session id.
-pub fn make_session() -> Result<String, reqwest::Error> {
-    let link = create_session_link();
-    let response = fetch_json(&link)?;
-    let session: Session = serde_json::from_str(&response).unwrap();
-    Ok(session.get_session_id().to_string())
 }
