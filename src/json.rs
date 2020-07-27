@@ -5,6 +5,8 @@ use serde_json::Value;
 use std::fs::File;
 use std::io::prelude::*;
 
+use super::response::Session;
+
 const BASE_LINK: &str = "http://api.smitegame.com/smiteapi.svc";
 
 fn read_file_to_string(path: &str) -> std::io::Result<String> {
@@ -25,7 +27,7 @@ fn read_secret(secret_key: &str) -> String {
 
 /// This returns time in YYYYMMDDHHSS format.
 /// Required for API queries.
-fn get_formatted_time() -> String {
+pub fn get_formatted_time() -> String {
     let now: DateTime<Utc> = Utc::now();
     now.format("%Y%m%d%H%M%S").to_string()
 }
@@ -37,13 +39,12 @@ fn make_signature(devid: &str, methodname: &str, token: &str, time: &str) -> Str
     format!("{:x}", md5::compute(bytes))
 }
 
-/// Combines keys and signatures with the desired method call to generate
-/// a base API query.
-/// Most activities require additional text, this is mostly a base and for creating
-/// the session.
-fn create_link(method: &str) -> String {
+/// Use signature to create the session link.
+/// Returns the link and the signature.
+pub fn create_session_link() -> String {
     let devid = read_secret("devid");
     let token = read_secret("token");
+    let method = "createsession";
     let time = get_formatted_time();
     let signature = make_signature(&devid, method, &token, &time);
 
@@ -53,7 +54,28 @@ fn create_link(method: &str) -> String {
     )
 }
 
+/// Use session id to create links to any method call.
+pub fn create_link(method: &str, session_id: &str, timestamp: &str) -> String {
+    let devid = read_secret("devid");
+    let time = get_formatted_time();
+    let token = read_secret("token");
+    let signature = make_signature(&devid, method, &token, &time);
+
+    format!(
+        "{}/{}json/{}/{}/{}/{}",
+        BASE_LINK, method, devid, signature, session_id, timestamp
+    )
+}
+
 pub fn fetch_json(link: &str) -> Result<String, reqwest::Error> {
     let response = reqwest::blocking::get(link)?.text()?;
     Ok(response)
+}
+
+/// Create the session and return the session id.
+pub fn make_session() -> Result<String, reqwest::Error> {
+    let link = create_session_link();
+    let response = fetch_json(&link)?;
+    let session: Session = serde_json::from_str(&response).unwrap();
+    Ok(session.get_session_id().to_string())
 }

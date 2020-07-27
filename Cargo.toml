@@ -9,5 +9,6 @@ edition = "2018"
 [dependencies]
 reqwest = { version = "0.10.7", features = ["blocking"] }
 serde_json = "1.0.57"
+serde = { version = "1.0.114", features = ["derive"] }
 chrono = "*"
 md5 = "*"
