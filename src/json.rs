@@ -65,6 +65,8 @@ pub fn make_session() -> Result<Session, reqwest::Error> {
 }
 
 /// Use session id to create links to any method call.
+/// NOTE: The timestamp here refers to what time you want the data from,
+/// it is not the "time" from the signature.
 pub fn create_link(method: &str, session_id: &str, timestamp: &str) -> String {
     let dev_id = read_secret("dev_id");
     let time = get_formatted_time();

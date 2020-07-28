@@ -4,6 +4,7 @@ mod response;
 fn main() {
     let session = json::make_session().unwrap();
     println!("Session started with id: {}", &session.session_id);
+    println!("Session started with timestamp: {}", &session.timestamp);
 
     let player_link = format!(
         "{}/{}",
