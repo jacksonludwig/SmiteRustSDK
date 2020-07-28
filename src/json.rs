@@ -8,6 +8,7 @@ use std::io::prelude::*;
 use super::response::Session;
 
 const BASE_LINK: &str = "http://api.smitegame.com/smiteapi.svc";
+const SECRET_PATH: &str = "resources/token.json";
 
 fn read_file_to_string(path: &str) -> std::io::Result<String> {
     let mut file = File::open(path)?;
@@ -19,7 +20,7 @@ fn read_file_to_string(path: &str) -> std::io::Result<String> {
 
 /// Use this to read the dev id and auth key from the token.json file.
 fn read_secret(secret_key: &str) -> String {
-    let token_file = read_file_to_string("resources/token.json").unwrap();
+    let token_file = read_file_to_string(SECRET_PATH).unwrap();
     let json: Value = serde_json::from_str(&token_file).unwrap();
 
     json[secret_key].as_str().unwrap().to_string()
@@ -33,8 +34,8 @@ pub fn get_formatted_time() -> String {
 }
 
 /// Generates an MD5-Hashed signature required for API queries.
-fn make_signature(devid: &str, methodname: &str, token: &str, time: &str) -> String {
-    let unhashed_signature = format!("{}{}{}{}", devid, methodname, token, time);
+fn make_signature(dev_id: &str, methodname: &str, token: &str, time: &str) -> String {
+    let unhashed_signature = format!("{}{}{}{}", dev_id, methodname, token, time);
     let bytes = unhashed_signature.as_bytes();
     format!("{:x}", md5::compute(bytes))
 }
@@ -42,36 +43,37 @@ fn make_signature(devid: &str, methodname: &str, token: &str, time: &str) -> Str
 /// Use signature to create the session link.
 /// Returns the link and the signature.
 pub fn create_session_link() -> String {
-    let devid = read_secret("devid");
+    let dev_id = read_secret("dev_id");
     let token = read_secret("token");
     let method = "createsession";
     let time = get_formatted_time();
-    let signature = make_signature(&devid, method, &token, &time);
+    let signature = make_signature(&dev_id, method, &token, &time);
 
     format!(
         "{}/{}json/{}/{}/{}",
-        BASE_LINK, method, devid, signature, time
+        BASE_LINK, method, dev_id, signature, time
     )
 }
 
-/// Create the session and return the session id.
-pub fn make_session() -> Result<String, reqwest::Error> {
+/// Create the session and return the session object.
+/// Contains importantly the session id and timestamp.
+pub fn make_session() -> Result<Session, reqwest::Error> {
     let link = create_session_link();
     let response = fetch_json(&link)?;
     let session: Session = serde_json::from_str(&response).unwrap();
-    Ok(session.get_session_id().to_string())
+    Ok(session)
 }
 
 /// Use session id to create links to any method call.
 pub fn create_link(method: &str, session_id: &str, timestamp: &str) -> String {
-    let devid = read_secret("devid");
+    let dev_id = read_secret("dev_id");
     let time = get_formatted_time();
     let token = read_secret("token");
-    let signature = make_signature(&devid, method, &token, &time);
+    let signature = make_signature(&dev_id, method, &token, &time);
 
     format!(
         "{}/{}json/{}/{}/{}/{}",
-        BASE_LINK, method, devid, signature, session_id, timestamp
+        BASE_LINK, method, dev_id, signature, session_id, timestamp
     )
 }
 
