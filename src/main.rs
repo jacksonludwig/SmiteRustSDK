@@ -6,14 +6,14 @@ fn main() {
     println!("Session started with id: {}", &session.session_id);
     println!("Session started with timestamp: {}", &session.timestamp);
 
-    let player_link = format!(
+    let link = format!(
         "{}/{}",
         json::create_link(
             "getplayer",
             &session.session_id,
             &json::get_formatted_time()
         ),
-        "SwiggedySwoody"
+        "Cherryo",
     );
-    println!("{}", player_link);
+    println!("{}", link);
 }
