@@ -82,9 +82,13 @@ pub fn fetch_json(link: &str) -> Result<String, reqwest::Error> {
 
 /// Create the session and return the session object.
 /// The object contains the session id and timestamp.
+/// This is REQUIRED to use the API and only lasts 15 minutes.
 pub fn make_session() -> Result<Session, reqwest::Error> {
     let link = create_session_link();
     let response = fetch_json(&link)?;
-    let session: Session = serde_json::from_str(&response).unwrap();
+    let mut session: Session = serde_json::from_str(&response).unwrap();
+
+    // Use our formatted time for timestamp instead. Offset of 15 sec just to be safe.
+    session.timestamp = (get_formatted_time().parse::<usize>().unwrap() - 15).to_string();
     Ok(session)
 }
