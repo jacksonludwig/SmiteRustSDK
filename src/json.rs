@@ -46,7 +46,6 @@ fn make_signature(dev_id: &str, methodname: &str, token: &str, time: &str) -> St
 }
 
 /// Use signature to create the session link.
-/// Returns the link and the signature.
 fn create_session_link() -> String {
     let dev_id = read_secret("dev_id");
     let token = read_secret("token");
