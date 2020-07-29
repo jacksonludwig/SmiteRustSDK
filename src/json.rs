@@ -74,7 +74,7 @@ pub fn create_link(method: &str, session_id: &str, timestamp: &str) -> String {
     )
 }
 
-/// Make a request using a link and return the json.
+/// Make a request using a link and return the json from the API query.
 pub fn fetch_json(link: &str) -> Result<String, reqwest::Error> {
     let response = reqwest::blocking::get(link)?.text()?;
     Ok(response)
