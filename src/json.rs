@@ -47,7 +47,7 @@ fn make_signature(dev_id: &str, methodname: &str, token: &str, time: &str) -> St
 
 /// Use signature to create the session link.
 /// Returns the link and the signature.
-pub fn create_session_link() -> String {
+fn create_session_link() -> String {
     let dev_id = read_secret("dev_id");
     let token = read_secret("token");
     let method = "createsession";
@@ -58,15 +58,6 @@ pub fn create_session_link() -> String {
         "{}/{}json/{}/{}/{}",
         BASE_LINK, method, dev_id, signature, time
     )
-}
-
-/// Create the session and return the session object.
-/// The object contains the session id and timestamp.
-pub fn make_session() -> Result<Session, reqwest::Error> {
-    let link = create_session_link();
-    let response = fetch_json(&link)?;
-    let session: Session = serde_json::from_str(&response).unwrap();
-    Ok(session)
 }
 
 /// Use session id to create links to any method call.
@@ -88,4 +79,13 @@ pub fn create_link(method: &str, session_id: &str, timestamp: &str) -> String {
 pub fn fetch_json(link: &str) -> Result<String, reqwest::Error> {
     let response = reqwest::blocking::get(link)?.text()?;
     Ok(response)
+}
+
+/// Create the session and return the session object.
+/// The object contains the session id and timestamp.
+pub fn make_session() -> Result<Session, reqwest::Error> {
+    let link = create_session_link();
+    let response = fetch_json(&link)?;
+    let session: Session = serde_json::from_str(&response).unwrap();
+    Ok(session)
 }
