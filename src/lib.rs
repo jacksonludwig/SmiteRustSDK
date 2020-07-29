@@ -1,5 +1,5 @@
-mod json;
-mod response;
+pub mod json;
+pub mod response;
 
 // fn main() {
 //     let session = json::make_session().unwrap();

@@ -1,3 +1,8 @@
+//! This module uses a token.json file in a resources folder inside your
+//! project's base directory.
+//!
+//! The token.json file should only contain the "dev_id" and "token" fields.
+
 use chrono::{DateTime, Utc};
 use md5;
 use reqwest;
@@ -56,7 +61,7 @@ pub fn create_session_link() -> String {
 }
 
 /// Create the session and return the session object.
-/// Contains importantly the session id and timestamp.
+/// The object contains the session id and timestamp.
 pub fn make_session() -> Result<Session, reqwest::Error> {
     let link = create_session_link();
     let response = fetch_json(&link)?;
