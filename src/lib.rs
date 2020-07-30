@@ -1,4 +1,5 @@
 pub mod json;
+pub mod queries;
 pub mod response;
 
 // fn main() {
