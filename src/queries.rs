@@ -20,4 +20,13 @@ impl QueryBuilder {
         );
         json::fetch_json(&link)
     }
+
+    /// Make a "getgods" query to the API.
+    pub fn get_gods(&self) -> Result<String, reqwest::Error> {
+        let link = format!(
+            "{}/1",
+            json::create_link("getgods", &self.session_id, &json::get_formatted_time())
+        );
+        json::fetch_json(&link)
+    }
 }
