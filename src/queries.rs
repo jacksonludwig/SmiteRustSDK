@@ -1,12 +1,12 @@
 use super::json;
 
-/// Create an object to make queries with its given id and timestamp.
+/// Create an object to make queries with its given id.
 pub struct QueryBuilder {
     session_id: String,
 }
 
 impl QueryBuilder {
-    /// Use the session id and timestamp to make a new builder.
+    /// Use the session id and current time to make a new builder.
     pub fn new(session_id: String) -> QueryBuilder {
         QueryBuilder { session_id }
     }
