@@ -15,12 +15,20 @@ use super::response::Session;
 const BASE_LINK: &str = "http://api.smitegame.com/smiteapi.svc";
 const SECRET_PATH: &str = "resources/token.json";
 
-fn read_file_to_string(path: &str) -> std::io::Result<String> {
+/// Read a given file into a String and return the result.
+pub fn read_file_to_string(path: &str) -> std::io::Result<String> {
     let mut file = File::open(path)?;
     let mut file_contents = String::new();
     file.read_to_string(&mut file_contents)?;
 
     Ok(file_contents)
+}
+
+/// Create/Write a String to a given path.
+pub fn write_string_to_file(path: &str, data: String) -> std::io::Result<()> {
+    let mut file = File::create(path)?;
+    file.write_all(&mut data.as_bytes())?;
+    Ok(())
 }
 
 /// Use this to read the dev id and auth key from the token.json file.
